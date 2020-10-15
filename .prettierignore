@@ -1,0 +1,11 @@
+/.build/**
+/build/**
+/coverage/**
+/dist/**
+/docs/**
+/generated/**
+/jsdoc/**
+/lib/**
+/node_modules/**
+/temp/**
+/tmp/**

@@ -1,0 +1,40 @@
+{
+  "name": "some-name-here",
+  "version": "1.0.0",
+  "author": "Daniel Zhang",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DanielHZhang/"
+  },
+  "contributors": [
+    "Daniel Zhang (https://github.com/danielhzhang)"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {},
+  "engines": {
+    "node": ">=6.6.0"
+  },
+  "dependencies": {
+    "fastify-plugin": "^2.3.4",
+    "xsurf": "^1.0.0"
+  },
+  "devDependencies": {
+    "@supersede/eslint-config": "^1.0.0",
+    "@supersede/prettier-config": "^1.0.0",
+    "@types/node": "^14.11.8",
+    "eslint": "^7.11.0",
+    "fastify": "^3.6.0",
+    "fastify-cookie": "^4.1.0",
+    "prettier": "^2.1.2",
+    "typescript": "^4.0.3"
+  },
+  "peerDependencies": {
+    "fastify": ">=3.0.0",
+    "fastify-cookie": ">=4.0.0"
+  }
+}

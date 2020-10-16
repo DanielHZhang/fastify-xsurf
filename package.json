@@ -1,5 +1,5 @@
 {
-  "name": "some-name-here",
+  "name": "fastify-xsurf",
   "version": "1.0.0",
   "author": "Daniel Zhang",
   "private": true,

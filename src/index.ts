@@ -1,43 +1,14 @@
 import assert from 'assert';
 import fp from 'fastify-plugin';
 import {createToken, createChecksum, verifyChecksum} from 'xsurf';
-import type {FastifyPluginCallback, FastifyReply} from 'fastify';
-import type {CookieSerializeOptions} from 'fastify-cookie';
+import type {FastifyPluginCallback, FastifyReply, onRequestHookHandler} from 'fastify';
+import type {CsrfPluginOptions, Method} from './types';
 
 const pluginName = 'fastify-xsurf';
 const decoratorSymbol = Symbol.for(pluginName);
 
-type Method =
-  | 'GET'
-  | 'HEAD'
-  | 'OPTIONS'
-  | 'PUT'
-  | 'POST'
-  | 'DELETE'
-  | 'CONNECT'
-  | 'TRACE'
-  | 'PATCH';
-
-export type CsrfPluginOptions = {
-  /** Methods to ignore checking for a CSRF token. Defaults to `['GET', 'HEAD', 'OPTIONS']`. */
-  ignoreMethods?: Method[];
-  /** Shared secret used to create the token checksum. */
-  secret: string;
-  /** Cookie key to store the CSRF token. Defaults to `csrfToken`. */
-  tokenKey?: string;
-  /** Cookie key to store the token checksum. Defaults to `csrfChecksum`. */
-  checksumKey?: string;
-  /** Error message that will be sent in response to the client with invalid tokens. */
-  errorMessage?: string;
-  /**
-   * Cookie options from `fastify-cookie`. Will override defaults on both the token and checksum
-   * cookies.
-   */
-  cookieOptions?: CookieSerializeOptions;
-};
-
 const plugin: FastifyPluginCallback<CsrfPluginOptions> = (fastify, options, next) => {
-  // Ensure only a single instance of this plugin has been registered.
+// Ensure only a single instance of this plugin has been registered.
   if (fastify.hasDecorator(decoratorSymbol)) {
     throw new Error(`Plugin ${pluginName} has already been registered.`);
   }
@@ -54,11 +25,17 @@ const plugin: FastifyPluginCallback<CsrfPluginOptions> = (fastify, options, next
   if (options.checksumKey) {
     assert(typeof options.checksumKey === 'string', 'Option `checksumKey` must be a string.');
   }
-  if (options.cookieOptions) {
+  if (options.cookie) {
     assert(
-      typeof options.cookieOptions === 'object' &&
-        Object.getPrototypeOf(options.cookieOptions) === Object.prototype,
+      typeof options.cookie === 'object' &&
+        Object.getPrototypeOf(options.cookie) === Object.prototype,
       'Option `secure` must be an object.'
+    );
+  }
+  if (options.validateOnRequest !== undefined) {
+    assert(
+      typeof options.validateOnRequest === 'boolean',
+      'Option `validateOnRequest` must be a boolean.'
     );
   }
 
@@ -75,17 +52,17 @@ const plugin: FastifyPluginCallback<CsrfPluginOptions> = (fastify, options, next
     reply.setCookie(tokenKey, token, {
       path: '/',
       sameSite: 'strict',
-      ...options.cookieOptions,
+      ...options.cookie,
     });
     reply.setCookie(checksumKey, checksum, {
       path: '/',
-      httpOnly: true,
       sameSite: 'strict',
-      ...options.cookieOptions,
+      ...options.cookie,
+      httpOnly: true,
     });
   };
 
-  fastify.addHook('preHandler', async (request, reply) => {
+  const handler: onRequestHookHandler = async (request, reply) => {
     // Regardless of request type, ensure that the client has a CSRF token.
     if (!request.cookies[tokenKey] || !request.cookies[checksumKey]) {
       createCsrfCookies(reply);
@@ -110,13 +87,19 @@ const plugin: FastifyPluginCallback<CsrfPluginOptions> = (fastify, options, next
     // Verify the CSRF token.
     const valid = verifyChecksum(headerToken, checksum, options.secret);
     if (!valid) {
-      // Bad token, do not proceed to route handler. Set valid cookies to prevent permanently
-      // broken tokens.
+      // Bad token, do not proceed to route handler. Set valid cookies to prevent
+      // permanently broken tokens.
       createCsrfCookies(reply);
       reply.status(400);
       throw new Error(options.errorMessage ?? 'Invalid CSRF token provided.');
     }
-  });
+  };
+
+  if (options.validateOnRequest || typeof options.validateOnRequest === 'undefined') {
+    fastify.addHook('onRequest', handler);
+  } else {
+    fastify.decorate('validateCsrf', handler);
+  }
 
   next();
 };
@@ -126,3 +109,6 @@ export const csrfPlugin = fp(plugin, {
   fastify: '>=3.0.0',
   dependencies: ['fastify-cookie'],
 });
+
+export default csrfPlugin;
+module.exports = csrfPlugin;

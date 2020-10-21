@@ -33,7 +33,6 @@
     "@supersede/eslint-config": "^1.0.2",
     "@supersede/prettier-config": "^1.0.0",
     "@types/node": "^14.14.1",
-    "axios": "^0.20.0",
     "eslint": "^7.11.0",
     "fastify": "^3.7.0",
     "fastify-cookie": "^4.1.0",

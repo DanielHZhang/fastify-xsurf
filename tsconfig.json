@@ -10,7 +10,7 @@
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "jsx": "react",
     "lib": [
       "dom",

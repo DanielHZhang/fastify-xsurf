@@ -47,25 +47,23 @@ export const callback: FastifyPluginCallback<CsrfPluginOptions> = (fastify, opti
   const createCsrfCookies = (reply: FastifyReply) => {
     const token = createToken();
     const checksum = createChecksum(token, options.secret);
-    // reply.clearCookie(tokenKey);
-    // reply.clearCookie(checksumKey);
     reply.setCookie(tokenKey, token, {
       path: '/',
       sameSite: 'strict',
       ...options.cookie,
     });
-    // reply.setCookie(checksumKey, checksum, {
-    //   path: '/',
-    //   sameSite: 'strict',
-    //   ...options.cookie,
-    //   httpOnly: true,
-    // });
+    reply.setCookie(checksumKey, checksum, {
+      path: '/',
+      sameSite: 'strict',
+      ...options.cookie,
+      httpOnly: true,
+    });
   };
 
   const handler: onRequestHookHandler = async (request, reply) => {
     const {headers, cookies, raw} = request;
     let cookiesRecentlyCreated = false;
-    console.log('what cooki', request.cookies);
+
     // Regardless of request type, ensure that the client has a CSRF token.
     if (!cookies[tokenKey] || !cookies[checksumKey]) {
       createCsrfCookies(reply);
@@ -78,7 +76,6 @@ export const callback: FastifyPluginCallback<CsrfPluginOptions> = (fastify, opti
     }
 
     // Skip checksum validation if cookies were created on an unignored method.
-    console.log('cookies recently created:', cookiesRecentlyCreated);
     if (cookiesRecentlyCreated) {
       // The request should be denied because the CSRF token was not present originally.
       reply.status(400);

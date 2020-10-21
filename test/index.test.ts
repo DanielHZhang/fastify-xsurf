@@ -1,12 +1,16 @@
-import type {FastifyInstance} from 'fastify';
-import fastify from 'fastify';
+import fastify, {FastifyInstance} from 'fastify';
 import cookiePlugin from 'fastify-cookie';
 import {callback as rawPluginCallback, csrfPlugin} from 'src/plugin';
 
 describe('Plugin options', () => {
-  const server = fastify();
+  let server: FastifyInstance;
   const secret = {secret: 'some secret'};
   const mockNextFn = () => undefined;
+
+  beforeAll(async () => {
+    server = fastify();
+    await server.ready();
+  });
 
   afterAll(async () => {
     await server.close();
@@ -25,7 +29,6 @@ describe('Plugin options', () => {
   });
 
   it('Errors on non-string `tokenKey`', () => {
-    // expect().toReturn
     expect(() => {
       // @ts-expect-error tokenKey not a string
       rawPluginCallback(server, {...secret, tokenKey: 42}, mockNextFn);
@@ -62,24 +65,97 @@ describe('Plugin options', () => {
 });
 
 describe('Plugin functionality', () => {
+  type Cookie = {
+    name: string;
+    value: string;
+    path: string;
+    httpOnly?: boolean;
+    sameSite: string;
+  };
+
   let server: FastifyInstance;
-  beforeEach(() => {
+  const success = {success: true};
+
+  beforeAll(async () => {
     server = fastify();
     server.register(cookiePlugin);
     server.register(csrfPlugin, {secret: 'very cool secret'});
+    server.post('/', async (req, reply) => success);
+    server.get('/', async (req, reply) => success);
+    await server.ready();
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await server.close();
   });
 
-  it('Sets the cookie', async () => {
+  it('Sets token and checksum cookies on bad request', async () => {
+    // No headers provided
     const response = await server.inject({
       method: 'POST',
       url: '/',
     });
+    const cookies = response.cookies as Cookie[];
+    expect(response.statusCode).toEqual(400);
+    expect(cookies).toHaveLength(2);
 
-    console.log('response status:', response.statusCode);
-    console.log('response received:', response.cookies);
+    const tokenIndex = cookies.findIndex((cookie) => cookie.name === 'csrfToken');
+    expect(tokenIndex).toBeGreaterThan(-1);
+
+    const checksumIndex = cookies.findIndex((cookie) => cookie.name === 'csrfChecksum');
+    expect(checksumIndex).toBeGreaterThan(-1);
+    expect(cookies[checksumIndex].httpOnly).toEqual(true); // Ensure checksum is httpOnly
+  });
+
+  it('Disregards bad tokens for ignored HTTP methods', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/',
+      headers: {
+        'x-csrf-token': 'very bad token value',
+      },
+    });
+    expect(response.statusCode).toEqual(200);
+    expect(response.json()).toStrictEqual(success);
+  });
+
+  it('Rejects the request when a bad token is provided', async () => {
+    const response = await server.inject({
+      method: 'POST',
+      url: '/',
+      headers: {
+        'x-csrf-token': 'bad token value lol',
+      },
+    });
+    expect(response.statusCode).toEqual(400);
+  });
+
+  it('Resolves the request when a good token is provided', async () => {
+    // Send bad response first to receive good token
+    const badResponse = await server.inject({
+      method: 'POST',
+      url: '/',
+    });
+    const cookies = badResponse.cookies as Cookie[];
+    const tokenCookie = cookies.find((c) => c.name === 'csrfToken');
+    const checksumCookie = cookies.find((c) => c.name === 'csrfChecksum');
+
+    if (!tokenCookie || !checksumCookie) {
+      throw new Error('No token or checksum found on injected response, this should never occur.');
+    }
+
+    const goodResponse = await server.inject({
+      method: 'POST',
+      url: '/',
+      headers: {
+        'x-csrf-token': tokenCookie.value,
+      },
+      cookies: {
+        csrfToken: tokenCookie.value,
+        csrfChecksum: checksumCookie.value,
+      },
+    });
+    expect(goodResponse.statusCode).toEqual(200);
+    expect(goodResponse.json()).toStrictEqual(success);
   });
 });

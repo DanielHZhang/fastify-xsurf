@@ -1,3 +1,3 @@
-import {csrfPlugin} from 'src/plugin';
+import {csrfPlugin} from './plugin';
 
 export = csrfPlugin;

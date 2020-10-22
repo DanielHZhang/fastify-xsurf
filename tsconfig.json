@@ -50,7 +50,6 @@
     "node_modules/**/*"
   ],
   "include": [
-    "scripts/**/*",
     "src/**/*",
     "test/**/*"
   ]

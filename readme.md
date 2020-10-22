@@ -147,8 +147,8 @@ Cookie options from `fastify-cookie`. Will override defaults on both the token a
 
 [MIT License][mit-url]
 
-[ci-image]: https://github.com/DanielHZhang/fastify-xsurf/workflows/nodejs-ci/badge.svg
-[ci-url]: https://github.com/DanielHZhang/fastify-xsurf/workflows/nodejs-ci
+[ci-image]: https://github.com/DanielHZhang/fastify-xsurf/workflows/build-test/badge.svg
+[ci-url]: https://github.com/DanielHZhang/fastify-xsurf/workflows/build-test
 [node-image]: https://badgen.net/npm/node/fastify-xsurf
 [node-url]: https://nodejs.org/en/download
 [npm-downloads-image]: https://badgen.net/npm/dm/fastify-xsurf

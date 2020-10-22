@@ -44,7 +44,7 @@
   "typescript.format.placeOpenBraceOnNewLineForFunctions": false,
   "typescript.format.semicolons": "insert",
   "typescript.reportStyleChecksAsWarnings": true,
-  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.preferences.quoteStyle": "single",
   "typescript.preferences.useAliasesForRenames": false,
   "typescript.tsdk": "node_modules\\typescript\\lib",

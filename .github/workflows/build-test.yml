@@ -4,10 +4,12 @@ name: build-test
 on:
   push:
     paths-ignore:
+      - ".github/**"
       - ".vscode/**"
       - "*.md"
   pull_request:
     paths-ignore:
+      - ".github/**"
       - ".vscode/**"
       - "*.md"
 

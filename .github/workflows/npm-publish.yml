@@ -10,41 +10,42 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           # "ref" specifies the branch to check out.
           # "github.event.release.target_commitish" specifies the target branch of the release.
           ref: ${{ github.event.release.target_commitish }}
 
-      - uses: actions/setup-node@v1
+      - name: Use Node.js
+        uses: actions/setup-node@v1
         with:
           node-version: 14
           registry-url: https://registry.npmjs.org/
 
-      # Clean install of projects dependencies, avoiding `yarn.lock` changes.
-      - run: yarn install --frozen-lockfile
-
-      # Setup git with a bot.
-      - run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      # Upgrade npm version in package.json to the tag used in the release.
-      - run: yarn version ${{ github.event.release.tag_name }}
-
-      # Build the project and run tests if any.
-      - run: |
+      - name: Clean install of dependencies, build, and test
+        # Avoid `yarn.lock` changes.
+        run: |
+          yarn install --frozen-lockfile
           yarn build
           yarn test
 
-      # Publish to NPM via auth token.
-      - run: yarn publish
+      - name: Setup git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Upgrade version in package.json to release tag version
+        run: yarn version ${{ github.event.release.tag_name }}
+
+      - name: Publish to NPM via auth token
+        run: yarn publish
         env:
           # Ensure NPM_TOKEN is added to repository secrets.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Push the version changes to GitHub.
-      - run: git push
+      - name: Push version changes
+        run: git push
         env:
-          # GITHUB_TOKEN is automatically configured.
+          # GITHUB_TOKEN is automatically provided by actions.
           github-token: ${{ secrets.GITHUB_TOKEN }}

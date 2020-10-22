@@ -17,10 +17,7 @@
   ],
   "scripts": {
     "test": "jest -c test/jest.config.js",
-    "build": "rm -rf lib && tsc -p tsconfig.prod.json",
-    "prepublishOnly": "yarn build",
-    "version": "git add .",
-    "postversion": "git push && git push --tags"
+    "build": "rm -rf lib && tsc-suppress -p tsconfig.prod.json"
   },
   "engines": {
     "node": ">=6.6.0"

@@ -25,7 +25,7 @@ jobs:
         uses: actions/create-release@v1
         with:
           tag_name: ${{ steps.vars.outputs.tag }}
-          release_name: Release ${{ stpes.vars.outputs.tag }}
+          release_name: Release ${{ steps.vars.outputs.tag }}
           draft: false
           prerelease: false
         env:

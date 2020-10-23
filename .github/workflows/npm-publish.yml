@@ -1,10 +1,10 @@
-# Workflow for publishing a package to NPM.
-name: npm-publish
+# Workflow for creating a new release and publishing it to NPM.
+name: npm-release-publish
 
 on:
-  release:
-    # Trigger the workflow when publishing a new release
-    types: [published]
+  push:
+    tags:
+      - "v*" # Trigger the workflow on push tag events matching glob (e.g. v1.0, v20.15.10)
 
 jobs:
   build:
@@ -16,6 +16,18 @@ jobs:
           # "ref" specifies the branch to check out.
           # "github.event.release.target_commitish" specifies the target branch of the release.
           ref: ${{ github.event.release.target_commitish }}
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+        env:
+          # GITHUB_TOKEN is automatically provided by actions.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use Node.js
         uses: actions/setup-node@v1

@@ -1,8 +1,9 @@
 {
   "name": "fastify-xsurf",
+  "description": "A Fastify plugin that adds CSRF protection to HTTP routes",
   "version": "1.0.0",
   "author": "Daniel Zhang",
-  "private": true,
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/DanielHZhang/fastify-xsurf"
@@ -42,5 +43,12 @@
   "peerDependencies": {
     "fastify": ">=3.6.0",
     "fastify-cookie": ">=4.1.0"
-  }
+  },
+  "keywords": [
+    "csrf",
+    "xsrf",
+    "fastify",
+    "plugin",
+    "protection"
+  ]
 }

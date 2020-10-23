@@ -34,13 +34,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Get tag name without "v" prefix
+      - name: Get tag name without prefix
         id: vars
         uses: actions/github-script@v3
         with:
           script: |
-            const id = github.event.release.tag_name.slice(1);
-            core.setOutput('tag_name', id);
+            const tagPath = 'refs/tags/v';
+            const tag = github.context.ref.substring(tagPath.length);
+            core.setOutput('tag_name', tag);
 
       - name: Upgrade version in package.json to release tag version
         run: yarn version --new-version ${{ steps.vars.outputs.tag_name }}

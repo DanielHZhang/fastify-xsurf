@@ -2,37 +2,27 @@
 name: npm-release-publish
 
 on:
-  push:
-    tags:
-      - v*.*.* # Trigger the workflow on push tag events matching glob (e.g. v1.0, v20.15.10)
-    paths-ignore:
-      - .github/**
-      - .vscode/**
-      - test/**
+  release:
+    # Trigger the workflow when a release is published
+    # This specifies that the build will be triggered when we publish a release
+    types: [published]
 
 jobs:
   publish:
-    name: Create and publish release to NPM
+    name: Publish the release to NPM
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        # Create a local variable containing the pushed tag name
-        # (extracted from "refs/tags/{{tagName}}" via parameter expansion)
-      - name: Set output
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
         with:
-          tag_name: ${{ steps.vars.outputs.tag }}
-          release_name: Release ${{ steps.vars.outputs.tag }}
-          draft: false
-          prerelease: false
-        env:
-          # GITHUB_TOKEN is automatically provided by actions.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # "ref": the branch to check out.
+          # "github.event.release.target_commitish": the target branch of the release
+          ref: ${{ github.event.release.target_commitish }}
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
       - name: Clean install of dependencies, build, and test
         # Avoid `yarn.lock` changes.
         run: |
@@ -54,3 +44,8 @@ jobs:
         env:
           # GITHUB_TOKEN is automatically provided by actions.
           github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     # Create a local variable containing the pushed tag name
+      #   # (extracted from "refs/tags/{{tagName}}" via parameter expansion)
+      # - name: Set output
+      #   id: vars
+      #   run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}

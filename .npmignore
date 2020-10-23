@@ -10,5 +10,7 @@ test/
 .prettierrc
 jest.config.js
 nodemon.json
+package-lock.json
 tsconfig.json
 tsconfig.build.json
+yarn.lock

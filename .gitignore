@@ -2,7 +2,6 @@
 .build/
 .local/
 lib/
-yarn.lock
 
 # Logs
 logs

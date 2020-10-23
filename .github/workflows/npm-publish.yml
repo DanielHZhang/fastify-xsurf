@@ -5,8 +5,10 @@ on:
   push:
     tags:
       - v*.*.* # Trigger the workflow on push tag events matching glob (e.g. v1.0, v20.15.10)
-    branches:
-      - main
+    paths-ignore:
+      - .github/**
+      - .vscode/**
+      - test/**
 
 jobs:
   release:

@@ -4,13 +4,13 @@ name: build-test
 on:
   push:
     paths-ignore:
-      - ".github/**"
-      - ".vscode/**"
+      - .github/**
+      - .vscode/**
       - "*.md"
   pull_request:
     paths-ignore:
-      - ".github/**"
-      - ".vscode/**"
+      - .github/**
+      - .vscode/**
       - "*.md"
 
 jobs:

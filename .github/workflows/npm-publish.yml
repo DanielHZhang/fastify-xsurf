@@ -5,6 +5,8 @@ on:
   push:
     tags:
       - "v*" # Trigger the workflow on push tag events matching glob (e.g. v1.0, v20.15.10)
+    branches:
+      - main
 
 jobs:
   build:
@@ -12,11 +14,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          # "ref" specifies the branch to check out.
-          # "github.event.release.target_commitish" specifies the target branch of the release.
-          ref: ${{ github.event.release.target_commitish }}
 
+        # with:
+        #   # "ref" specifies the branch to check out.
+        #   # "github.event.release.target_commitish" specifies the target branch of the release.
+        #   ref: ${{ github.event.release.target_commitish }}
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -42,22 +44,20 @@ jobs:
           yarn build
           yarn test
 
-      - name: Setup git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
       - name: Upgrade version in package.json to release tag version
         run: yarn version ${{ github.event.release.tag_name }}
 
       - name: Publish to NPM via auth token
-        run: yarn publish
+        run: yarn publish --tag ${{ github.event.release.target_commitish }}
         env:
           # Ensure NPM_TOKEN is added to repository secrets.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Push version changes
-        run: git push
+      - name: Config git and push version changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git push
         env:
           # GITHUB_TOKEN is automatically provided by actions.
           github-token: ${{ secrets.GITHUB_TOKEN }}

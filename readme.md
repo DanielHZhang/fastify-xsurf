@@ -42,10 +42,7 @@ With ES module `import` syntax:
 
 ```typescript
 import cookiePlugin from 'fastify-cookie';
-// Default import...
 import csrfPlugin from 'fastify-xsurf';
-// ... or named import
-import {csrfPlugin} from 'fastify-xsurf';
 
 fastify.register(cookiePlugin);
 fastify.register(csrfPlugin, {

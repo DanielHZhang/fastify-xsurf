@@ -11,6 +11,9 @@
   "contributors": [
     "Daniel Zhang (https://github.com/danielhzhang)"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [

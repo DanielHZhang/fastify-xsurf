@@ -40,7 +40,7 @@ jobs:
         with:
           script: |
             const tagPath = 'refs/tags/v';
-            const tag = github.context.ref.substring(tagPath.length);
+            const tag = context.ref.substring(tagPath.length);
             core.setOutput('tag_name', tag);
 
       - name: Upgrade version in package.json to release tag version

@@ -11,8 +11,8 @@ on:
       - test/**
 
 jobs:
-  release:
-    name: Create release
+  publish:
+    name: Create and publish release to NPM
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -33,18 +33,6 @@ jobs:
         env:
           # GITHUB_TOKEN is automatically provided by actions.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  publish:
-    name: Publish to NPM
-    runs-on: ubuntu-latest
-    needs: release # Only run after release workflow has completed
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14
-          registry-url: https://registry.npmjs.org/
       - name: Clean install of dependencies, build, and test
         # Avoid `yarn.lock` changes.
         run: |

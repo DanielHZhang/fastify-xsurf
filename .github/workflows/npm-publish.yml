@@ -3,9 +3,8 @@ name: npm-release-publish
 
 on:
   release:
-    # Trigger the workflow when a release is published
-    # This specifies that the build will be triggered when we publish a release
-    types: [published]
+    # Trigger the workflow when a release is published (skipping pre-releases)
+    types: [released]
 
 jobs:
   publish:
@@ -45,14 +44,13 @@ jobs:
 
       - name: Upgrade version in package.json to release tag version
         run: yarn version --new-version ${{ steps.vars.outputs.tag_name }}
-
-      - name: Publish to NPM via auth token
-        run: yarn publish
-        env:
-          # Ensure NPM_TOKEN is added to repository secrets.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Push version changes
-        run: git push
-        env:
-          # GITHUB_TOKEN is automatically provided by actions.
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Publish to NPM via auth token
+      #   run: yarn publish
+      #   env:
+      #     # Ensure NPM_TOKEN is added to repository secrets.
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # - name: Push version changes
+      #   run: git push
+      #   env:
+      #     # GITHUB_TOKEN is automatically provided by actions.
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}

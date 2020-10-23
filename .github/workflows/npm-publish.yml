@@ -30,7 +30,7 @@ jobs:
           yarn build
           yarn test
       - name: Upgrade version in package.json to release tag version
-        run: yarn version --new-version ${{ github.event.release.tag_name }} --no-git-tag-version
+        run: yarn version --new-version ${{ github.event.release.tag_name }}
       - name: Publish to NPM via auth token
         run: yarn publish
         env:
@@ -44,8 +44,3 @@ jobs:
         env:
           # GITHUB_TOKEN is automatically provided by actions.
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     # Create a local variable containing the pushed tag name
-      #   # (extracted from "refs/tags/{{tagName}}" via parameter expansion)
-      # - name: Set output
-      #   id: vars
-      #   run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}

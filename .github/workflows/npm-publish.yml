@@ -4,7 +4,7 @@ name: npm-release-publish
 on:
   push:
     tags:
-      - v* # Trigger the workflow on push tag events matching glob (e.g. v1.0, v20.15.10)
+      - v*.*.* # Trigger the workflow on push tag events matching glob (e.g. v1.0, v20.15.10)
     branches:
       - main
 
@@ -15,12 +15,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        # Create a local variable containing the pushed tag name
+        # (extracted from "refs/tags/{{tagName}}" via parameter expansion)
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.vars.outputs.tag }}
+          release_name: Release ${{ stpes.vars.outputs.tag }}
           draft: false
           prerelease: false
         env:

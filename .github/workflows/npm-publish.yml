@@ -29,18 +29,30 @@ jobs:
           yarn install --frozen-lockfile
           yarn build
           yarn test
+      - name: Configure git auth
+        # Use bot username and email
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Get tag name without "v" prefix
+        id: vars
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const id = github.event.release.tag_name.slice(1);
+            core.setOutput('tag_name', id);
+
       - name: Upgrade version in package.json to release tag version
-        run: yarn version --new-version ${{ github.event.release.tag_name }}
+        run: yarn version --new-version ${{ steps.vars.outputs.tag_name }}
+
       - name: Publish to NPM via auth token
         run: yarn publish
         env:
           # Ensure NPM_TOKEN is added to repository secrets.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Configure git and push version changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git push
+      - name: Push version changes
+        run: git push
         env:
           # GITHUB_TOKEN is automatically provided by actions.
           github-token: ${{ secrets.GITHUB_TOKEN }}

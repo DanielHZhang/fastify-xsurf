@@ -33,7 +33,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
       - name: Get tag name without prefix
         id: vars
         uses: actions/github-script@v3
@@ -42,16 +41,15 @@ jobs:
             const tagPath = 'refs/tags/v';
             const tag = context.ref.substring(tagPath.length);
             core.setOutput('tag_name', tag);
-
       - name: Upgrade version in package.json to release tag version
         run: yarn version --new-version ${{ steps.vars.outputs.tag_name }}
-      # - name: Publish to NPM via auth token
-      #   run: yarn publish
-      #   env:
-      #     # Ensure NPM_TOKEN is added to repository secrets.
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      # - name: Push version changes
-      #   run: git push
-      #   env:
-      #     # GITHUB_TOKEN is automatically provided by actions.
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish to NPM via auth token
+        run: yarn publish
+        env:
+          # Ensure NPM_TOKEN is added to repository secrets.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Push version changes
+        run: git push
+        env:
+          # GITHUB_TOKEN is automatically provided by actions.
+          github-token: ${{ secrets.GITHUB_TOKEN }}

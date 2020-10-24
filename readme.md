@@ -74,6 +74,19 @@ fastify.route({
 })
 ```
 
+On the browser client, ensure that the most recent value of the `csrfToken` cookie is used and copied to of the following headers (case sensitive) for each protected request: `x-csrf-token`, `csrf-token`, `xsrf-token`, or `x-xsrf-token`.
+
+```typescript
+// Get token from cookies
+const token = /(?:^|;\s*)csrfToken=([^;]+)/.exec(document.cookie);
+fetch(url, {
+  method: 'POST',
+  headers: {
+    'x-csrf-token': token, // copy token to header
+  },
+});
+```
+
 ## Options (object)
 
 _Typescript users: options type is exported as `CsrfPluginOptions`._

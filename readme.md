@@ -78,7 +78,7 @@ On the browser client, ensure that the most recent value of the `csrfToken` cook
 
 ```typescript
 // Get token from cookies
-const token = /(?:^|;\s*)csrfToken=([^;]+)/.exec(document.cookie);
+const token = /(?:^|;\s*)csrfToken=([^;]+)/.exec(document.cookie)?.[1];
 fetch(url, {
   method: 'POST',
   headers: {

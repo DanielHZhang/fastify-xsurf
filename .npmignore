@@ -13,4 +13,5 @@ nodemon.json
 package-lock.json
 tsconfig.json
 tsconfig.build.json
+tsconfig.build.tsbuildinfo
 yarn.lock

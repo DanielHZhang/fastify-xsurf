@@ -10,7 +10,7 @@ const decoratorSymbol = Symbol.for(pluginName);
 export const callback: FastifyPluginCallback<CsrfPluginOptions> = (fastify, options, next) => {
   // Ensure only a single instance of this plugin has been registered.
   if (fastify.hasDecorator(decoratorSymbol)) {
-    throw new Error(`Plugin ${pluginName} has already been registered.`);
+    throw new Error(`The plugin '${pluginName}' has already been registered!`);
   }
   fastify.decorate(decoratorSymbol, true);
 

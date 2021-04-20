@@ -31,8 +31,8 @@ jobs:
       - name: Configure git auth
         # Use bot username and email
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
       - name: Get tag name without prefix
         id: vars
         uses: actions/github-script@v3

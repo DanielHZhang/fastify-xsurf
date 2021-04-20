@@ -38,12 +38,12 @@ export const callback: FastifyPluginCallback<CsrfPluginOptions> = (fastify, opti
     );
   }
 
-  // Ignore methods that do not modify data on the server.
-  const ignoreMethods = options.ignoreMethods || ['GET', 'HEAD', 'OPTIONS'];
-  const errorMessage = options.errorMessage?.toString() ?? 'Invalid CSRF token provided.';
+  const ignoreMethods = options.ignoreMethods
+    ? options.ignoreMethods.map((value) => value.toUpperCase())
+    : ['GET', 'HEAD', 'OPTIONS'];
+  const errorMessage = options.errorMessage || 'Invalid CSRF token provided.';
   const tokenKey = options.tokenKey || 'csrfToken';
   const checksumKey = options.checksumKey || 'csrfChecksum';
-
   const createCsrfCookies = (reply: FastifyReply) => {
     const token = createToken();
     const checksum = createChecksum(token, options.secret);
@@ -60,18 +60,17 @@ export const callback: FastifyPluginCallback<CsrfPluginOptions> = (fastify, opti
     });
   };
 
-  const handler: onRequestHookHandler = async (request, reply) => {
-    const {headers, cookies, raw} = request;
+  const handler: onRequestHookHandler = async (req, reply) => {
     let cookiesRecentlyCreated = false;
 
     // Regardless of request type, ensure that the client has a CSRF token.
-    if (!cookies[tokenKey] || !cookies[checksumKey]) {
+    if (!req.cookies[tokenKey] || !req.cookies[checksumKey]) {
       createCsrfCookies(reply);
       cookiesRecentlyCreated = true;
     }
 
     // Skip checksum validation for ignored methods.
-    if (!raw.method || ignoreMethods.includes(raw.method as Method)) {
+    if (!req.raw.method || ignoreMethods.includes(req.raw.method as Method)) {
       return;
     }
 
@@ -84,17 +83,15 @@ export const callback: FastifyPluginCallback<CsrfPluginOptions> = (fastify, opti
 
     // Get the CSRF token from the request header.
     const rawToken =
-      headers['x-csrf-token'] ||
-      headers['csrf-token'] ||
-      headers['xsrf-token'] ||
-      headers['x-xsrf-token'] ||
+      req.headers['csrf-token'] ||
+      req.headers['xsrf-token'] ||
+      req.headers['x-csrf-token'] ||
+      req.headers['x-xsrf-token'] ||
       '';
-    const headerToken = Array.isArray(rawToken) ? rawToken[0] : rawToken;
-    const checksum = cookies[checksumKey];
+    const tokenAttempt = Array.isArray(rawToken) ? rawToken[0] : rawToken;
 
     // Verify the CSRF token.
-    const valid = verifyChecksum(headerToken, checksum, options.secret);
-    if (!valid) {
+    if (!verifyChecksum(tokenAttempt, req.cookies[checksumKey], options.secret)) {
       createCsrfCookies(reply); // Set valid cookies to prevent permanently broken tokens.
       reply.status(400);
       throw new Error(errorMessage);

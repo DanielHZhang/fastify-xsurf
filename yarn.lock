@@ -1502,11 +1502,10 @@ fast-safe-stringify@^2.0.8:
   integrity sha512-lXatBjf3WPjmWD6DpIZxkeSsCOwqI0maYMpgDlx8g4U2qi4lbjA9oH/HD2a87G+KfsUmo5WbJFmqBZlPxtptag==
 
 fastify-cookie@^5.3.1:
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/fastify-cookie/-/fastify-cookie-5.3.1.tgz#97b17f3f297b06ffc8e27fe7a0398aefa9df74f0"
-  integrity sha512-ubiC5ydvgqaXOydeg3G+SFEiTJtsyNPde6ForXi+UG66aDbsHlWNLJTQZg4BopXv+MJ0SzlShGVCWv26mgAwpw==
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/fastify-cookie/-/fastify-cookie-5.4.0.tgz#2648b64a9f4090c783369b86f5862b1cc501fec3"
+  integrity sha512-uKTbOLx6pSyKqA9oD2G9hpMuRTVtKRm98bRwJVg4ga7GCm+RR6771stmfhbblXxHHcQQHuHvwdOdPeHJjr2sgg==
   dependencies:
-    cookie "^0.4.0"
     cookie-signature "^1.1.0"
     fastify-plugin "^3.0.0"
 
